@@ -35,29 +35,35 @@ arma::mat Fitness::ReadFitnessCases(std::string filepath) {
     return X;
 }
 
-void Fitness::SetFitnessCases(const arma::mat& X, FitnessCasesType fct) {
-    arma::vec Y = X.col(X.n_cols - 1);
-    arma::mat Xx = X;
-    Xx.shed_col(Xx.n_cols - 1);
-
+void Fitness::SetFitnessCases(const arma::mat& X, const arma::vec& Y, FitnessCasesType fct) {
     if (fct == FitnessCasesTRAIN) {
         TrainY = Y;
-        TrainX = Xx;
+        TrainX = X;
 
         trainY_mean = arma::mean(TrainY);
         trainY_std = arma::stddev(TrainY, 1);
 
         var_comp_trainY = Y - trainY_mean;
+    	cout << "# train: " << " ( " << X.n_rows << "x" << X.n_cols << " )" << endl;
     } else if (fct == FitnessCasesTEST) {
         TestY = Y;
-        TestX = Xx;
+        TestX = X;
+    	cout << "# test: " << " ( " << X.n_rows << "x" << X.n_cols << " )" << endl;
     } else if (fct == FitnessCasesVALIDATION) {
         ValidationY = Y;
-        ValidationX = Xx;
+        ValidationX = X;
+    	cout << "# validation: " << " ( " << X.n_rows << "x" << X.n_cols << " )" << endl;
     } else {
         throw std::runtime_error("Fitness::SetFitnessCases invalid fitness cases type provided.");
     }
+}
 
+void Fitness::SetFitnessCases(const arma::mat& X, FitnessCasesType fct) {
+    arma::vec Y = X.col(X.n_cols - 1);
+    arma::mat Xx = X;
+    Xx.shed_col(Xx.n_cols - 1);
+
+	this->SetFitnessCases(Xx, Y, fct);
 }
 
 arma::vec Fitness::GetPopulationFitness(const std::vector<Node*>& population, bool compute, bool use_caching) {
@@ -65,12 +71,12 @@ arma::vec Fitness::GetPopulationFitness(const std::vector<Node*>& population, bo
     vec fitnesses(population.size());
 
     if (compute) {
-#pragma omp parallel for schedule(static)
+//#pragma omp parallel for schedule(static)
         for (size_t i = 0; i < population.size(); i++) {
             fitnesses[i] = ComputeFitness(population[i], use_caching);
         }
     } else {
-#pragma omp parallel for schedule(static)
+//#pragma omp parallel for schedule(static)
         for (size_t i = 0; i < population.size(); i++) {
             fitnesses[i] = population[i]->cached_fitness;
         }

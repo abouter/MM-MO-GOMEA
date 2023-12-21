@@ -1,20 +1,22 @@
 #structure inspired on duckdb
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.25)
 cmake_policy(SET CMP0026 NEW)
 cmake_policy(SET CMP0051 NEW)
+#cmake_policy(SET CMP0148 NEW)
 
 project(GPGOMEA)
 
 find_package(Armadillo REQUIRED)
-find_package(PythonLibs REQUIRED)
+# Include python libraries
+find_package(Python COMPONENTS Interpreter Development NumPy REQUIRED)
+message("Found Python\n\tDIRS: ${Python_INCLUDE_DIRS}\t${Python_NumPy_INCLUDE_DIRS}\n\tLIBS: ${Python_LIBRARIES}")
+
+#find_package(PythonLibs REQUIRED)
 # Extract major/minor python version
-string(REPLACE "." ";" VERSION_LIST ${PYTHONLIBS_VERSION_STRING})
-list(GET VERSION_LIST 0 PYTHONLIBS_VERSION_MAJOR)                                                                                                                             
-list(GET VERSION_LIST 1 PYTHONLIBS_VERSION_MINOR)
-find_package(Boost COMPONENTS system filesystem program_options thread python${PYTHONLIBS_VERSION_MAJOR}${PYTHONLIBS_VERSION_MINOR} numpy${PYTHONLIBS_VERSION_MAJOR}${PYTHONLIBS_VERSION_MINOR} REQUIRED)
+find_package(Boost COMPONENTS system filesystem program_options thread python${Python_VERSION_MAJOR}${Python_VERSION_MINOR} numpy${Python_VERSION_MAJOR}${Python_VERSION_MINOR} REQUIRED)
 find_package(OpenMP REQUIRED)
 
-set(CMAKE_CXX_STANDARD 11) 
+set(CMAKE_CXX_STANDARD 17) 
 set(CMAKE_CXX_STANDARD_REQUIRED ON) 
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -60,7 +62,7 @@ if(${FORCE_COLORED_OUTPUT})
   endif()
 endif()
 
-option(ENABLE_SANITIZER "Enable address sanitizer." TRUE)
+option(ENABLE_SANITIZER "Enable address sanitizer." FALSE)
 option(ENABLE_UBSAN "Enable undefined behavior sanitizer." TRUE)
 
 if(${ENABLE_SANITIZER})
@@ -184,7 +186,33 @@ endif()
 include_directories(src/Include)
 include_directories(${ARMADILLO_INCLUDE_DIR})
 include_directories(${Boost_INCLUDE_DIR})
-include_directories(${PYTHON_INCLUDE_PATH})
+include_directories(${Python_INCLUDE_DIRS})
 add_compile_options(${OpenMP_CXX_FLAGS})
 add_subdirectory(src)
 
+### Pybind interface (pyfe)
+# Include Eigen
+find_package(Eigen3 REQUIRED)
+set(EIGEN3_INCLUDE_DIR "${EIGEN3_INCLUDE_DIR}")
+if(NOT EIGEN3_INCLUDE_DIR)
+  message(FATAL_ERROR "Please point the environment variable EIGEN3_INCLUDE_DIR to the include directory of your Eigen3 installation.")
+endif()
+
+# Include pybind11
+set(PYBIND11_CPP_STANDARD -std=c++17)
+find_package(pybind11 CONFIG REQUIRED)
+
+set(PY_LIB_NAME _pb_mmmogpg)
+message("OBJECTS: ${ALL_OBJECT_FILES}")
+add_library(${PY_LIB_NAME} MODULE src/PythonInterface/python_interface.cpp ${ALL_OBJECT_FILES})
+set_target_properties(${PY_LIB_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+#target_compile_definitions(${PY_LIB_NAME} PUBLIC NUM_PRECISION=${NUM_PRECISION})
+target_include_directories(${PY_LIB_NAME} PUBLIC ${Python_INCLUDE_DIRS} ${Python_NumPy_INCLUDE_DIRS})
+target_include_directories(${PY_LIB_NAME} PUBLIC ${EIGEN3_INCLUDE_DIR})
+target_link_libraries(${PY_LIB_NAME} PRIVATE pybind11::pybind11 pybind11::headers pybind11::module pybind11::lto Python::NumPy)
+target_link_libraries(${PY_LIB_NAME} PRIVATE ${GPGOMEA_LINK_LIBS})
+pybind11_extension(${PY_LIB_NAME})
+if(NOT MSVC AND NOT ${CMAKE_BUILD_TYPE} MATCHES Debug|RelWithDebInfo)
+    # Strip unnecessary sections of the binary on Linux/macOS
+    pybind11_strip(${PY_LIB_NAME})
+endif()

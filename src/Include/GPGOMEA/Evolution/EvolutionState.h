@@ -74,6 +74,8 @@ public:
     }
 
     void SetOptions(int argc, char* argv[]);
+	void SetDataSetTraining(const arma::mat& X, const arma::vec& y);
+	void SetDataSetTest(const arma::mat& X, const arma::vec& y);
 
     Fitness * FetchFitnessFunctionGivenProbName(std::string prob_name);
 
@@ -97,6 +99,9 @@ public:
     };
 
 private:
+
+	void InitializeTerminals(const arma::mat& Xtrain);
+	void InitializeERC();
 
     void ReadAndSetDataSets(boost::program_options::variables_map& vm);
     void SetOptionsFromFile(std::string filename);

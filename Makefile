@@ -16,18 +16,18 @@ endif
 release:
 	mkdir -p build/release && \
         cd build/release && \
-        cmake $(GENERATOR) $(FORCE_COLOR) ${DISABLE_SANITIZER_FLAG} -DCMAKE_BUILD_TYPE=Release ../.. && \
+        cmake $(GENERATOR) $(FORCE_COLOR) ${DISABLE_SANITIZER_FLAG} -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$(CONDA_PREFIX) ../.. && \
         cmake --build .
 
 debug:
 	mkdir -p build/debug && \
         cd build/debug && \
-        cmake $(GENERATOR) $(FORCE_COLOR) ${DISABLE_SANITIZER_FLAG} -DCMAKE_BUILD_TYPE=Debug ../.. && \
+        cmake $(GENERATOR) $(FORCE_COLOR) ${DISABLE_SANITIZER_FLAG} -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=$(CONDA_PREFIX) ../.. && \
         cmake --build .
 reldebug:
 	mkdir -p build/reldebug && \
 	cd build/reldebug && \
-	cmake $(GENERATOR) $(FORCE_COLOR) ${DISABLE_SANITIZER_FLAG} -DCMAKE_BUILD_TYPE=Reldebug ../.. && \
+	cmake $(GENERATOR) $(FORCE_COLOR) ${DISABLE_SANITIZER_FLAG} -DCMAKE_BUILD_TYPE=Reldebug -DCMAKE_PREFIX_PATH=$(CONDA_PREFIX) ../.. && \
 	cmake --build .
 
 clean:

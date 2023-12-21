@@ -4,8 +4,35 @@ using namespace std;
 using namespace arma;
 namespace po = boost::program_options;
 
-void EvolutionState::ReadAndSetDataSets(po::variables_map& vm) {
+void EvolutionState::InitializeTerminals(const mat& Xtrain){
+    // ADD VARIABLE TERMINALS  
+    for (size_t i = 0; i < Xtrain.n_cols; i++)
+        config->terminals.push_back(new OpVariable(i));
+}
 
+void EvolutionState::InitializeERC(){
+    // ADD SR ERC
+    if (config->use_ERC) {
+        double_t biggest_val = arma::max(arma::max(arma::abs(fitness->TrainX)));
+        double_t min_erc = -5 * biggest_val; //min(fitness->TrainY);
+        double_t max_erc = 5 * biggest_val; //max(fitness->TrainY);
+        config->terminals.push_back(new OpRegrConstant(min_erc, max_erc));
+    }
+}
+
+void EvolutionState::SetDataSetTraining(const mat& X, const vec& y) {
+    fitness->SetFitnessCases(X, y, FitnessCasesType::FitnessCasesTRAIN);
+	
+	InitializeTerminals(X);
+
+	InitializeERC();
+}
+
+void EvolutionState::SetDataSetTest(const mat& X, const vec& y) {
+    fitness->SetFitnessCases(X, y, FitnessCasesType::FitnessCasesTEST);
+}
+
+void EvolutionState::ReadAndSetDataSets(po::variables_map& vm) {
     string train = vm["train"].as<string>();
     string test;
     if (vm.count("test"))
@@ -29,7 +56,6 @@ void EvolutionState::ReadAndSetDataSets(po::variables_map& vm) {
         fitness->SetFitnessCases(V, FitnessCasesType::FitnessCasesVALIDATION);
     }
 
-
     fitness->SetFitnessCases(TR, FitnessCasesType::FitnessCasesTRAIN);
     fitness->SetFitnessCases(TE, FitnessCasesType::FitnessCasesTEST);
 
@@ -38,18 +64,9 @@ void EvolutionState::ReadAndSetDataSets(po::variables_map& vm) {
         cout << "# validation: " << validation_perc << " of train ( " << V.n_rows << "x" << V.n_cols - 1 << " )" << endl;
     cout << "# test: " << test << " ( " << TE.n_rows << "x" << TE.n_cols - 1 << " )" << endl;
 
+	InitializeTerminals(fitness->TrainX);
 
-    // ADD VARIABLE TERMINALS  
-    for (size_t i = 0; i < TR.n_cols - 1; i++)
-        config->terminals.push_back(new OpVariable(i));
-
-    // ADD SR ERC
-    if (config->use_ERC) {
-        double_t biggest_val = arma::max(arma::max(arma::abs(fitness->TrainX)));
-        double_t min_erc = -5 * biggest_val; //min(fitness->TrainY);
-        double_t max_erc = 5 * biggest_val; //max(fitness->TrainY);
-        config->terminals.push_back(new OpRegrConstant(min_erc, max_erc));
-    }
+	InitializeERC();
 }
 
 Fitness * EvolutionState::FetchFitnessFunctionGivenProbName(string prob_name) {
