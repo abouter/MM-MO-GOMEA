@@ -92,7 +92,7 @@ static vector<size_t> GetPermutedFOSIndices(size_t fos_size) {
     for (size_t i = 0; i < fos_size; i++) {
         permut_fos_indices.push_back(i);
     }
-    std::random_shuffle(permut_fos_indices.begin(), permut_fos_indices.end());
+    std::shuffle(permut_fos_indices.begin(), permut_fos_indices.end(), Utils::rng);
     return permut_fos_indices;
 }
 

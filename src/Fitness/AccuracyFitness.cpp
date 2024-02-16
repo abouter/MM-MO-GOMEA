@@ -20,7 +20,6 @@ void AccuracyFitness::SetFitnessCases(const arma::mat& X, FitnessCasesType fct) 
     arma::mat Xx = X;
     Xx.shed_col(Xx.n_cols - 1);
 
-
     if (fct == FitnessCasesTRAIN) {
 
         class_count_map.clear();

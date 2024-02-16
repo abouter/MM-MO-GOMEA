@@ -34,8 +34,8 @@ public:
 
     arma::mat ReadFitnessCases(std::string filepath);
 
-    virtual void SetFitnessCases(const arma::mat & X, FitnessCasesType fct);
-	void SetFitnessCases(const arma::mat& X, const arma::vec& Y, FitnessCasesType fct);
+    virtual void SetFitnessCases(const arma::mat& X, FitnessCasesType fct);
+	virtual void SetFitnessCases(const arma::mat& X, const arma::vec& Y, FitnessCasesType fct);
 
     virtual double_t ComputeFitness(Node * n, bool use_caching);
     

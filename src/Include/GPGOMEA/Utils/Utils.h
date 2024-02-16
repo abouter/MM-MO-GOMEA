@@ -33,6 +33,8 @@
 class Utils {
 public:
 
+    static std::default_random_engine rng;
+
     static std::string ReplaceCharInString(const std::string original, char to_replace, char replacing);
 
     static std::string ToLowerCase(const std::string original);

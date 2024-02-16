@@ -18,6 +18,8 @@ using namespace arma;
 namespace py = boost::python;
 namespace np = boost::python::numpy;
 
+std::default_random_engine Utils::rng;
+
 std::string Utils::ReplaceCharInString(const std::string original, char to_replace, char replacing) {
     std::string new_one(original);
     for (size_t i = 0; i < new_one.length(); ++i) {

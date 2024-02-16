@@ -29,7 +29,7 @@ void MOArchive::UpdateMOArchive(Node *offspring) {
     boost::unique_lock<boost::shared_mutex> write_guard(mo_lock);
     bool solution_is_dominated = false;
     bool diversity_added = false;
-    bool identical_objectives_already_exist;
+    bool identical_objectives_already_exist = false;
     for (size_t i = 0; i < mo_archive.size(); i++) {
         // check domination
         solution_is_dominated = mo_archive[i]->Dominates(offspring);

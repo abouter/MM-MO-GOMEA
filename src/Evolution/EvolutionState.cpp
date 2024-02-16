@@ -210,7 +210,7 @@ void EvolutionState::SetOptions(int argc, char* argv[]) {
         srand(time(NULL));
         config->rng_seed = rand() % 999999;
     }
-
+    Utils::rng = std::default_random_engine(config->rng_seed);
     arma_rng::set_seed(config->rng_seed);
     cout << "# rng seed set to " << config->rng_seed << endl;
 

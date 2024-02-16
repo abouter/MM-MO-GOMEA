@@ -75,7 +75,7 @@ void GOMEAGenerationHandler::PerformGeneration(std::vector<Node*> & population) 
 
     // elitism
     if (conf->elitism > 1) {
-        random_shuffle(offspring.begin(), offspring.end());
+        shuffle(offspring.begin(), offspring.end(), Utils::rng);
 
         vector<size_t> elitism_indices;
         elitism_indices.reserve(conf->elitism);

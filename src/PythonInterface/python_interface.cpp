@@ -18,7 +18,6 @@ typedef Eigen::ArrayXf VecRef;
 
 arma::mat MatRefToArma(MatRef m){
 	arma::mat out(m.rows(), m.cols());
-	cout << "M: " << m.rows() << " " << m.cols() << endl;
 	for(int i = 0; i < m.rows(); i++)
 		for(int j = 0; j < m.cols(); j++)
 			out(i,j) = m(i,j);
@@ -27,7 +26,6 @@ arma::mat MatRefToArma(MatRef m){
 
 arma::vec VecRefToArma(VecRef v){
 	arma::vec out(v.rows());
-	cout << "V: " << v.rows() << " " << v.cols() << endl;
 	for(int i = 0; i < v.rows(); i++)
 		out(i) = v(i);
 	return out;
@@ -47,10 +45,12 @@ py::list evolve(string options, MatRef X, VecRef y) {
 	EvolutionState * st = new EvolutionState();
 	st->config->running_from_python = true;
 	st->SetOptions(argc, argv);
-	arma::mat aX = MatRefToArma(X);
-	arma::mat ay = VecRefToArma(y);
-	st->SetDataSetTraining(aX, ay);
-	st->SetDataSetTest(aX, ay);
+	arma::mat aXtrain = MatRefToArma(X);
+	arma::mat aXtest = MatRefToArma(X);
+	arma::mat aytrain = VecRefToArma(y);
+	arma::mat aytest = VecRefToArma(y);
+	st->SetDataSetTraining(aXtrain, aytrain);
+	st->SetDataSetTest(aXtest, aytest);
 
 	IMSHandler * imsh = new IMSHandler(st);
 
@@ -58,21 +58,22 @@ py::list evolve(string options, MatRef X, VecRef y) {
 	imsh->Start();
 
 	// 3. OUTPUT
-	MOArchive out_archive;
+	Node *elitist = imsh->GetFinalElitist();
+	/*MOArchive out_archive;
 	for (EvolutionRun * r : imsh->runs) {
 		for( auto ind : r->mo_archive.mo_archive ){
 			out_archive.UpdateMOArchive(ind);
 		}
 	}
-	
 	if (out_archive.mo_archive.empty()) {
 		throw runtime_error("No models found, something went wrong");
-	}
+	}*/
+
 	py::list models;
-	for (auto sol : out_archive.mo_archive ){
-		string model_repr = sol->GetPythonExpression();
+	//for (auto sol : out_archive.mo_archive ){
+		string model_repr = elitist->GetPythonExpression();//sol->GetPythonExpression();
 		models.append(model_repr);
-	}
+	//}
 
 	// 4. CLEANUP
 	delete imsh;

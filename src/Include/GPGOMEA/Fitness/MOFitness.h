@@ -10,6 +10,7 @@ public:
 
 	MOFitness(std::vector<Fitness*> sub_fitness_functions);
 
+	virtual void SetFitnessCases(const arma::mat& X, const arma::vec& y, FitnessCasesType fct) override;
 	virtual void SetFitnessCases(const arma::mat & X, FitnessCasesType fct) override;
 
 	virtual ~MOFitness() {

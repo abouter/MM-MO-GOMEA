@@ -7,6 +7,12 @@ MOFitness::MOFitness(std::vector<Fitness*> sub_fitness_functions) {
     this->sub_fitness_functions = sub_fitness_functions;
 }
 
+void MOFitness::SetFitnessCases(const arma::mat& X, const arma::vec& y, FitnessCasesType fct) {
+    Fitness::SetFitnessCases(X, y, fct);
+    for(Fitness * fitness : sub_fitness_functions)
+        fitness->SetFitnessCases(X, y, fct);
+}
+
 void MOFitness::SetFitnessCases(const arma::mat& X, FitnessCasesType fct) {
     Fitness::SetFitnessCases(X, fct);
     for(Fitness * fitness : sub_fitness_functions)
