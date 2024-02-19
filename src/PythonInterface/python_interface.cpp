@@ -1,5 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
+#include <pybind11/stl.h>
 #include <iostream>
 #include <Eigen/Dense>
 
@@ -31,26 +32,51 @@ arma::vec VecRefToArma(VecRef v){
 	return out;
 }
 
-py::list evolve(string options, MatRef X, VecRef y) {
+py::list evolve(MatRef Xtrain, VecRef ytrain, MatRef Xtest = MatRef(), VecRef ytest = VecRef(), string file = "", const py::kwargs &kwargs = py::dict()) {
 	// 1. SETUP
-	auto opts = Utils::SplitStringByChar(options, ' ');
-	int argc = opts.size()+1;
-	char * argv[argc];
-	string title = "mmmogpg";
-	argv[0] = (char*) title.c_str();
-	for (int i = 1; i < argc; i++) {
-		argv[i] = (char*) opts[i-1].c_str();
-	}
-
 	EvolutionState * st = new EvolutionState();
 	st->config->running_from_python = true;
-	st->SetOptions(argc, argv);
-	arma::mat aXtrain = MatRefToArma(X);
-	arma::mat aXtest = MatRefToArma(X);
-	arma::mat aytrain = VecRefToArma(y);
-	arma::mat aytest = VecRefToArma(y);
+	
+	if( file.size() > 0 )  
+	{
+		st->SetOptionsFromFile(file);
+		if( kwargs )
+			std::cout << "Warning: Reading parameter settings from file. Input parameters are ignored." << std::endl;
+	}
+	else if( kwargs )
+	{
+		int argc = 1;
+		char * argv[kwargs.size()+1];
+		string title = "mmmogpg";
+		argv[0] = (char*) title.c_str();
+		
+		for( auto item: kwargs )
+		{
+			std::string arg_str = "--";
+			arg_str += std::string(py::str(item.first));
+			arg_str += "=";
+			arg_str += std::string(py::str(item.second));
+			argv[argc++] = (char*) arg_str.c_str();
+			//std::cout << arg_str << std::endl;
+		}
+		st->SetOptions(argc, argv);
+	}
+
+	arma::mat aXtrain = MatRefToArma(Xtrain);
+	arma::mat aytrain = VecRefToArma(ytrain);
 	st->SetDataSetTraining(aXtrain, aytrain);
-	st->SetDataSetTest(aXtest, aytest);
+	if (Xtest.size() > 0 && ytest.size() > 0)
+	{
+		arma::mat aXtest = MatRefToArma(Xtest);
+		arma::mat aytest = VecRefToArma(ytest);
+		st->SetDataSetTest(aXtest, aytest);
+	}
+	else
+	{
+		arma::mat aXtest = MatRefToArma(Xtrain);
+		arma::mat aytest = VecRefToArma(ytrain);
+		st->SetDataSetTest(aXtest, aytest);
+	}
 
 	IMSHandler * imsh = new IMSHandler(st);
 
@@ -83,5 +109,6 @@ py::list evolve(string options, MatRef X, VecRef y) {
 
 PYBIND11_MODULE(_pb_mmmogpg, m) {
   m.doc() = "pybind11-based interface for MM-MO-GOMEA"; // optional module docstring
-  m.def("evolve", &evolve, "Runs MM-MO-GOMEA evolution in C++");
+  m.def("evolve", &evolve, "Runs MM-MO-GOMEA evolution in C++",
+  	py::arg("Xtrain").none(true) = py::none(), py::arg("ytrain").none(true) = py::none(), py::arg_v("Xtest", MatRef(), "None"), py::arg_v("ytest", VecRef(), "None"), py::arg("file") );
 }

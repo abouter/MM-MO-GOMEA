@@ -74,6 +74,7 @@ public:
     }
 
     void SetOptions(int argc, char* argv[]);
+    void SetOptionsFromFile(std::string filename);
 	void SetDataSetTraining(const arma::mat& X, const arma::vec& y);
 	void SetDataSetTest(const arma::mat& X, const arma::vec& y);
 
@@ -97,14 +98,13 @@ public:
     EvolutionState() {
         config = new ConfigurationOptions();
     };
-
+    
 private:
 
 	void InitializeTerminals(const arma::mat& Xtrain);
 	void InitializeERC();
 
     void ReadAndSetDataSets(boost::program_options::variables_map& vm);
-    void SetOptionsFromFile(std::string filename);
 
 };
 
