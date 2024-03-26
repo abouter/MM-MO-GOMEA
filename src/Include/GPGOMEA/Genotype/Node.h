@@ -50,6 +50,10 @@ public:
     virtual std::string GetSubtreeHumanExpression();
 
     virtual std::string GetPythonExpression();
+    
+    virtual std::string GetDescriptionHeader();
+
+    virtual std::string GetExpressionDescription();
 
     virtual size_t GetArity() const;
 

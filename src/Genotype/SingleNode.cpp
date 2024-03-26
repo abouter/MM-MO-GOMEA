@@ -259,6 +259,20 @@ std::string SingleNode::GetPythonExpression() {
     return result;
 }
 
+std::string SingleNode::GetDescriptionHeader() {
+    return "Model;Size;";
+}
+
+std::string SingleNode::GetExpressionDescription() {
+    string result = "";
+
+    GetPythonExpR(result);
+
+    result += ";" + to_string(GetSubtreeNodes(true).size()) + ";";
+
+    return result;
+}
+
 void SingleNode::GetSubtreeExpressionRecursive(string & expr, bool only_active_nodes) {
     expr += GetValue();
     if (only_active_nodes)

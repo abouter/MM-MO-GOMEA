@@ -153,20 +153,42 @@ void MOArchive::SaveResults(size_t gen) {
         results_path += "/mo_archive_gen0" + std::to_string(gen) + ".csv";
     if (std::to_string(gen).size() == 3)
         results_path += "/mo_archive_gen" + std::to_string(gen) + ".csv";
+
     std::ofstream myfile(results_path, std::ios::trunc);
-    myfile << "nr" << "|" << "obj1_train" << "|" << "obj2_train" << "|" << "obj1_test" << "|" << "obj2_test" << "|" << "exp1" << "|" << "exp2" << std::endl;
+    // Write header
+    myfile << "index;" << "obj1_train;" << "obj2_train;" << "obj1_test;" << "obj2_test";
+    if( mo_archive.size() == 0 )
+    {
+        myfile << std::endl;
+        return;
+    }
+    if ((mo_archive[0])->type == NodeType::Multi) {
+        for (int ind = 1; ind <= (((Multitree *) mo_archive[0])->nodes).size(); ind++ ) {
+            myfile << ";exp" << ind << ";size" << ind; 
+            ind++;
+        }
+        myfile << std::endl;
+    }
+    else {
+        myfile << ";exp;size" << std::endl;
+    }
+
+    // Write solutions
     for (size_t p = 0; p < mo_archive.size(); p++) {
         fitness->GetTestFit(mo_archive[p]);
         if ((mo_archive[0])->type == NodeType::Multi) {
-            myfile << p << "| " << mo_archive[p]->cached_objectives[0] << "| " << mo_archive[p]->cached_objectives[1]<< "| " << mo_archive[p]->cached_objectives_test[0]<< "| " << mo_archive[p]->cached_objectives_test[1];
+            myfile << (p+1) << "; " << mo_archive[p]->cached_objectives[0] << "; " << mo_archive[p]->cached_objectives[1]<< "; " << mo_archive[p]->cached_objectives_test[0]<< "; " << mo_archive[p]->cached_objectives_test[1];
             for (Node *k: (((Multitree *) mo_archive[p])->nodes)) {
-                myfile << "|" << k->GetPythonExpression();
+                myfile << ";" << k->GetPythonExpression();
+            }
+            for (Node *k: (((Multitree *) mo_archive[p])->nodes)) {
+                myfile << ";" << k->GetSubtreeNodes(true).size();
             }
             myfile << std::endl;
 
         } else {
-            myfile << p << "| " << mo_archive[p]->cached_objectives[0] << "| " << mo_archive[p]->cached_objectives[1]<< "| " << mo_archive[p]->cached_objectives_test[0]<< "| " << mo_archive[p]->cached_objectives_test[1]
-                   << mo_archive[p]->GetPythonExpression() << std::endl;
+            myfile << (p+1) << "; " << mo_archive[p]->cached_objectives[0] << "; " << mo_archive[p]->cached_objectives[1]<< "; " << mo_archive[p]->cached_objectives_test[0]<< "; " << mo_archive[p]->cached_objectives_test[1]
+                   << mo_archive[p]->GetPythonExpression() << ";" << mo_archive[p]->GetSubtreeNodes(true).size() << std::endl;
 
         }
 

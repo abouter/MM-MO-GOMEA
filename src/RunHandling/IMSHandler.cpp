@@ -18,10 +18,10 @@ using namespace std;
 void IMSHandler::Start() {
 
     string stats_file = "stats_generations.txt";
-    string heading = "gen\ttime\tevals\tbest_fit\tbest_size\tpop_size";
-    if (!st->config->running_from_python) {
-        Logger::GetInstance()->Log(heading, st->config->results_path  + "/" + stats_file);
-    }
+    string solutions_file = "generations.csv";
+    string stats_heading = "gen\ttime\tevals\tbest_fit\tbest_size\tpop_size";
+    if (!st->config->running_from_python)
+        Logger::GetInstance()->Log(stats_heading, st->config->results_path  + "/" + stats_file);
 
     macro_generation = 0;
 
@@ -40,6 +40,7 @@ void IMSHandler::Start() {
 
     size_t current_pop_size = st->config->population_size;
     size_t biggest_pop_size_reached = 0;
+    Node *elitist = NULL;
 
     while (true) {
 
@@ -110,6 +111,7 @@ void IMSHandler::Start() {
                 if (runs[i]->elitist_fit < elitist_fit) {
                     elitist_fit = runs[i]->elitist_fit;
                     elitist_size = runs[i]->elitist->GetSubtreeNodes(true).size();
+                    elitist = runs[i]->elitist;
 
                     // reset the count on the number of times this run performed poorly
                     number_of_times_run_was_worse_than_later_run[i] = 0;
@@ -171,9 +173,15 @@ void IMSHandler::Start() {
         string generation_stats = to_string(macro_generation) + "\t" + to_string(st->timer.toc()) + "\t" +
                                   to_string(st->fitness->evaluations) + "\t" + to_string(elitist_fit) + "\t" +
                                   to_string(elitist_size) + "\t" + to_string(biggest_pop_size_reached);
+        /*string elitist_stats = to_string(macro_generation) + "; " + elitist->GetExpressionDescription() + to_string(elitist_fit);
+
+        if( macro_generation == 1 )
+            Logger::GetInstance()->Log("Generation;"+elitist->GetDescriptionHeader(), st->config->results_path + "/" + solutions_file);*/
 
         if (!st->config->running_from_python)
             Logger::GetInstance()->Log(generation_stats, st->config->results_path  + "/" + stats_file);
+        //else
+            //Logger::GetInstance()->Log(elitist_stats, st->config->results_path  + "/" + solutions_file);
         cout << " > generation " << macro_generation << " - best fit: " << elitist_fit << endl;
 
     }
