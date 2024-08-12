@@ -1,6 +1,6 @@
 # Termination Criteria
 time -1
-generations 1
+generations 3
 evaluations -1
 
 # Problem setting
@@ -16,11 +16,11 @@ gomfos LT_i	# This sets the FOS for GP-GOMEAS. Here we use the linkage tree over
 # Initialization
 initmaxtreeheight 2
 syntuniqinit 2000
-popsize 2000
+popsize 500
 
 # Other
 seed 1
 parallel 1
 nrtrees 2
-
+writeoutput
 

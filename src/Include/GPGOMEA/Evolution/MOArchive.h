@@ -11,6 +11,9 @@
 
 class MOArchive {
 public:
+    MOArchive(){};
+    MOArchive(Fitness *f) : fitness(f) {};
+
     Fitness *fitness;
     ConfigurationOptions *config;
 

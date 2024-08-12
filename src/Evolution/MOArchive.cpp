@@ -57,9 +57,13 @@ void MOArchive::UpdateMOArchive(Node *offspring) {
             mo_archive[i] = nullptr;
         }
     }
-    mo_archive.erase(
-            std::remove_if(mo_archive.begin(), mo_archive.end(), [](Node *node) { return node == nullptr; }),
-            mo_archive.end());
+    if(mo_archive.size() > 0){
+        mo_archive.erase(
+            std::remove_if(mo_archive.begin(), mo_archive.end(),
+            [](Node *node) { return node == nullptr; }),
+            mo_archive.end()
+        );
+    }
 
     if ((!solution_is_dominated && !identical_objectives_already_exist) || (diversity_added)) {
         Node *new_node = offspring->CloneSubtree();
@@ -148,15 +152,15 @@ void MOArchive::SaveResults(size_t gen) {
     boost::unique_lock<boost::shared_mutex> read_guard(mo_lock);
     std::string results_path= config->results_path;
     if (std::to_string(gen).size() == 1)
-        results_path += "/mo_archive_gen00" + std::to_string(gen) + ".csv";
-    if (std::to_string(gen).size() == 2)
-        results_path += "/mo_archive_gen0" + std::to_string(gen) + ".csv";
-    if (std::to_string(gen).size() == 3)
-        results_path += "/mo_archive_gen" + std::to_string(gen) + ".csv";
+        results_path += "/generation00" + std::to_string(gen) + ".csv";
+    else if (std::to_string(gen).size() == 2)
+        results_path += "/generation0" + std::to_string(gen) + ".csv";
+    else
+        results_path += "/generation" + std::to_string(gen) + ".csv";
 
     std::ofstream myfile(results_path, std::ios::trunc);
     // Write header
-    myfile << "index;" << "obj1_train;" << "obj2_train;" << "obj1_test;" << "obj2_test";
+    myfile << "individual;" << "fitness1_train;" << "fitness2_train;" << "fitness1_test;" << "fitness2_test";
     if( mo_archive.size() == 0 )
     {
         myfile << std::endl;
@@ -164,8 +168,7 @@ void MOArchive::SaveResults(size_t gen) {
     }
     if ((mo_archive[0])->type == NodeType::Multi) {
         for (int ind = 1; ind <= (((Multitree *) mo_archive[0])->nodes).size(); ind++ ) {
-            myfile << ";exp" << ind << ";size" << ind; 
-            ind++;
+            myfile << ";tree_" << ind << ";tree_" << ind << "_size"; 
         }
         myfile << std::endl;
     }

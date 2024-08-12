@@ -83,8 +83,13 @@ std::string Multitree::GetDescriptionHeader() {
     string expr;
     size_t index = 1;
     for (SingleNode * n : nodes){
-        expr += "Model" + to_string(index) + ";";
-        expr += "Size" + to_string(index) + ";";
+        expr += "Model";
+        if(index > 1 )
+            expr += to_string(index);
+        expr += ";Size";
+        if(index > 1 )
+            expr += to_string(index);
+        expr += ";";
         index++;
     }
     return expr;

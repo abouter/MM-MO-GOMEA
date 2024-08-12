@@ -21,7 +21,7 @@ def run():
 	models = mgpg.evolve(X,y,file="params/py_params_multimodal.txt",seed=1)
 	print("Output models:")
 	for m in models:
-		print(models)
+		print(m)
 
 if __name__ == '__main__':
 	run()

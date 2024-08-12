@@ -20,7 +20,7 @@ void IMSHandler::Start() {
     string stats_file = "stats_generations.txt";
     string solutions_file = "generations.csv";
     string stats_heading = "gen\ttime\tevals\tbest_fit\tbest_size\tpop_size";
-    if (!st->config->running_from_python)
+    if (st->config->write_output_files)
         Logger::GetInstance()->Log(stats_heading, st->config->results_path  + "/" + stats_file);
 
     macro_generation = 0;
@@ -149,8 +149,6 @@ void IMSHandler::Start() {
 
                 if (should_terminate) {
                     terminated_runs[i] = true;
-                    delete runs[i];
-                    runs[i] = NULL;
 
                     if (i == min_run_idx) {
                         for (size_t j = min_run_idx + 1; j <= max_run_idx + 1; j++) {
@@ -178,7 +176,7 @@ void IMSHandler::Start() {
         if( macro_generation == 1 )
             Logger::GetInstance()->Log("Generation;"+elitist->GetDescriptionHeader(), st->config->results_path + "/" + solutions_file);*/
 
-        if (!st->config->running_from_python)
+        if (st->config->write_output_files)
             Logger::GetInstance()->Log(generation_stats, st->config->results_path  + "/" + stats_file);
         //else
             //Logger::GetInstance()->Log(elitist_stats, st->config->results_path  + "/" + solutions_file);
@@ -274,7 +272,7 @@ void IMSHandler::Terminate() {
         msg += out;
     }
 
-    if (!st->fitness->TestY.empty() && !st->config->running_from_python) {
+    if (!st->fitness->TestY.empty() && st->config->write_output_files) {
         double_t test_fit = st->fitness->GetTestFit(final_elitist);
         out = "Test fit:\t" + to_string(test_fit) + "\n";
         cout << out;
@@ -291,8 +289,9 @@ void IMSHandler::Terminate() {
     cout << out;
     msg += out;
 
-    if (!st->config->running_from_python)
+    if (st->config->write_output_files)
         Logger::GetInstance()->Log(msg, st->config->results_path + "/result.txt");
+
 }
 
 

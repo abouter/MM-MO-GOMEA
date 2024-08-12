@@ -84,22 +84,23 @@ py::list evolve(MatRef Xtrain, VecRef ytrain, MatRef Xtest = MatRef(), VecRef yt
 	imsh->Start();
 
 	// 3. OUTPUT
-	Node *elitist = imsh->GetFinalElitist();
-	/*MOArchive out_archive;
+    MOArchive out_archive(st->fitness);
 	for (EvolutionRun * r : imsh->runs) {
-		for( auto ind : r->mo_archive.mo_archive ){
-			out_archive.UpdateMOArchive(ind);
-		}
+		if(r){
+            for( auto ind : r->mo_archive.mo_archive ){
+                out_archive.UpdateMOArchive(ind);
+            }
+        }
 	}
 	if (out_archive.mo_archive.empty()) {
 		throw runtime_error("No models found, something went wrong");
-	}*/
+	}
 
 	py::list models;
-	//for (auto sol : out_archive.mo_archive ){
-		string model_repr = elitist->GetPythonExpression();//sol->GetPythonExpression();
+	for (auto sol : out_archive.mo_archive ){
+		string model_repr = sol->GetPythonExpression();
 		models.append(model_repr);
-	//}
+	}
 
 	// 4. CLEANUP
 	delete imsh;
