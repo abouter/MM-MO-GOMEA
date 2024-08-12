@@ -117,6 +117,8 @@ public:
     bool linear_scaling = false;
 
     bool running_from_python = false;
+    
+    bool write_output_files = false;
 
     size_t nrtrees = 1;
 

@@ -181,7 +181,8 @@ void EvolutionState::SetOptions(int argc, char* argv[]) {
             ("linearscaling", "enables linear scaling in symbolic regression (defeault is disabled)")
             ("classweights", po::value<string>(), "use class weighting for classification (default is disabled, use a single '_' to set to training set distribution, else specify manually by underscore-separated weights)")
             ("pyprobdef", po::value<string>(), "necessary to set name of module and name of function to use to evaluate individuals (separated by '_', so do not use it in their names them)")
-            ("nrtrees", po::value<size_t>(), "sets the number of trees");
+            ("nrtrees", po::value<size_t>(), "sets the number of trees")
+            ("writeoutput", "enables writing output to file");
 
 
 
@@ -558,6 +559,11 @@ void EvolutionState::SetOptions(int argc, char* argv[]) {
         cout << "# uniform depth variation: enabled" << endl;
     }
 
+    // OUTPUT
+    if ((vm.count("writeoutput"))) {
+        cout << "# writing output to file enabled" << endl;
+        config->write_output_files = true;
+    }
 
     cout << "##########################################################################################" << endl;
 

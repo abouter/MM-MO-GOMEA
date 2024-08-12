@@ -41,6 +41,10 @@ public:
     std::string GetSubtreeHumanExpression() override;
 
     std::string GetPythonExpression() override;
+    
+    std::string GetDescriptionHeader() override;
+    
+    std::string GetExpressionDescription() override;
 
     void  GetPythonExpR(std::string& expr);
 

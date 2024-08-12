@@ -79,12 +79,39 @@ std::string Multitree::GetSubtreeHumanExpression() {
     return expr;
 }
 
+std::string Multitree::GetDescriptionHeader() {
+    string expr;
+    size_t index = 1;
+    for (SingleNode * n : nodes){
+        expr += "Model";
+        if(index > 1 )
+            expr += to_string(index);
+        expr += ";Size";
+        if(index > 1 )
+            expr += to_string(index);
+        expr += ";";
+        index++;
+    }
+    return expr;
+}
+
+std::string Multitree::GetExpressionDescription() {
+    string expr;
+    size_t index = 1;
+    for (SingleNode * n : nodes){
+        expr += n->GetExpressionDescription();
+        index++;
+
+    }
+    return expr;
+}
+
 std::string Multitree::GetPythonExpression() {
     string expr;
     size_t index = 1;
     for (SingleNode * n : nodes){
-        expr += "Expression " + std::to_string(index) + ": ";
         expr += n->GetPythonExpression();
+        expr += "; ";
 //        expr += "\n ";
         index++;
 

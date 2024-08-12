@@ -37,6 +37,9 @@ public:
 
     std::string GetPythonExpression() override;
 
+    std::string GetDescriptionHeader() override;
+    
+    std::string GetExpressionDescription() override;
 
     std::string GetValue() const override;
 

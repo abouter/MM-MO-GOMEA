@@ -46,6 +46,14 @@ std::string Node::GetPythonExpression(){
     throw NotImplementedException("Node::GetDuckDBReadableExpression not implemented.");
 }
 
+std::string Node::GetDescriptionHeader(){
+    throw NotImplementedException("Node::GetDescriptionHeader not implemented.");
+}
+
+std::string Node::GetExpressionDescription(){
+    throw NotImplementedException("Node::GetExpressionDescription not implemented.");
+}
+
 std::vector<Node *> Node::GetSubtreeNodes(bool only_active){
     throw NotImplementedException("Node::GetSubtreeNodes not implemented.");
 }
