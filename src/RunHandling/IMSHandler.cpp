@@ -17,9 +17,9 @@ using namespace std;
 
 void IMSHandler::Start() {
 
-    string stats_file = "stats_generations.txt";
-    string solutions_file = "generations.csv";
-    string stats_heading = "gen\ttime\tevals\tbest_fit\tbest_size\tpop_size";
+    string stats_file = "generations.csv";
+    //string solutions_file = "generations.csv";
+    string stats_heading = "generation;time;evals;best_fit;best_size;pop_size";
     if (st->config->write_output_files)
         Logger::GetInstance()->Log(stats_heading, st->config->results_path  + "/" + stats_file);
 
@@ -168,9 +168,9 @@ void IMSHandler::Start() {
 
         macro_generation++;
 
-        string generation_stats = to_string(macro_generation) + "\t" + to_string(st->timer.toc()) + "\t" +
-                                  to_string(st->fitness->evaluations) + "\t" + to_string(elitist_fit) + "\t" +
-                                  to_string(elitist_size) + "\t" + to_string(biggest_pop_size_reached);
+        string generation_stats = to_string(macro_generation) + ";" + to_string(st->timer.toc()) + ";" +
+                                  to_string(st->fitness->evaluations) + ";" + to_string(elitist_fit) + ";" +
+                                  to_string(elitist_size) + ";" + to_string(biggest_pop_size_reached);
         /*string elitist_stats = to_string(macro_generation) + "; " + elitist->GetExpressionDescription() + to_string(elitist_fit);
 
         if( macro_generation == 1 )

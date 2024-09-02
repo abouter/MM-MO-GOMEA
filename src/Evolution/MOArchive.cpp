@@ -151,12 +151,7 @@ void MOArchive::InitMOArchive(std::vector<Node *> population) {
 void MOArchive::SaveResults(size_t gen) {
     boost::unique_lock<boost::shared_mutex> read_guard(mo_lock);
     std::string results_path= config->results_path;
-    if (std::to_string(gen).size() == 1)
-        results_path += "/generation00" + std::to_string(gen) + ".csv";
-    else if (std::to_string(gen).size() == 2)
-        results_path += "/generation0" + std::to_string(gen) + ".csv";
-    else
-        results_path += "/generation" + std::to_string(gen) + ".csv";
+    results_path += "/population_" + std::to_string(gen) + ".csv";
 
     std::ofstream myfile(results_path, std::ios::trunc);
     // Write header
