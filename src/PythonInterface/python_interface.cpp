@@ -10,7 +10,10 @@
 #include "GPGOMEA/RunHandling/IMSHandler.h"
 
 namespace py = pybind11; 
-using namespace std;
+using std::cout;
+using std::endl;
+using std::string;
+using std::vector;
 
 typedef Eigen::ArrayXXf MatRef;
 typedef Eigen::ArrayXf VecRef;
@@ -45,20 +48,31 @@ py::list evolve(MatRef Xtrain, VecRef ytrain, MatRef Xtest = MatRef(), VecRef yt
 	}
 	else if( kwargs )
 	{
-		int argc = 1;
-		char * argv[kwargs.size()+1];
-		string title = "mmmogpg";
-		argv[0] = (char*) title.c_str();
-		
+		// Convert to cmd-like arguments
+		vector<string> argv_vec;
+		argv_vec.push_back("mmmogpg");
 		for( auto item: kwargs )
 		{
-			std::string arg_str = "--";
+			string arg_str = "--";
 			arg_str += std::string(py::str(item.first));
-			arg_str += "=";
-			arg_str += std::string(py::str(item.second));
-			argv[argc++] = (char*) arg_str.c_str();
-			//std::cout << arg_str << std::endl;
+			string val = std::string(py::str(item.second));
+			if(val.find("False") != string::npos) continue; // Skip False arguments
+			else if(val.find("True") == string::npos) // For True arguments, don't add a value
+			{
+				arg_str += "=";
+				arg_str += val;
+			}
+			argv_vec.push_back(arg_str);
 		}
+		
+		// Convert to C-style array
+		int argc = argv_vec.size();
+		char * argv[argc];
+		for(int i = 0; i < argv_vec.size(); i++){
+			argv[i] = (char*) argv_vec[i].c_str();
+		}
+		
+		std::cout << std::endl;
 		st->SetOptions(argc, argv);
 	}
 
@@ -93,7 +107,7 @@ py::list evolve(MatRef Xtrain, VecRef ytrain, MatRef Xtest = MatRef(), VecRef yt
         }
 	}
 	if (out_archive.mo_archive.empty()) {
-		throw runtime_error("No models found, something went wrong");
+		throw std::runtime_error("No models found, something went wrong");
 	}
 
 	py::list models;
@@ -111,5 +125,5 @@ py::list evolve(MatRef Xtrain, VecRef ytrain, MatRef Xtest = MatRef(), VecRef yt
 PYBIND11_MODULE(_pb_mmmogpg, m) {
   m.doc() = "pybind11-based interface for MM-MO-GOMEA"; // optional module docstring
   m.def("evolve", &evolve, "Runs MM-MO-GOMEA evolution in C++",
-  	py::arg("Xtrain").none(true) = py::none(), py::arg("ytrain").none(true) = py::none(), py::arg_v("Xtest", MatRef(), "None"), py::arg_v("ytest", VecRef(), "None"), py::arg("file") );
+  	py::arg("Xtrain").none(true) = py::none(), py::arg("ytrain").none(true) = py::none(), py::arg_v("Xtest", MatRef(), "None"), py::arg_v("ytest", VecRef(), "None"), py::arg("file") = "" );
 }
