@@ -17,7 +17,9 @@ using namespace std;
 
 Logger * Logger::instance = NULL;
 
-void Logger::Log(std::string message, std::string file) {
+void Logger::Log(std::string message, std::string file) {   
+     
+    filesystem::create_directories(filesystem::path(file).parent_path());
 
     if (file.compare(ofile) != 0) {
         if (ostream.is_open())

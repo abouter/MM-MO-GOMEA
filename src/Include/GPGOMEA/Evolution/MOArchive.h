@@ -5,6 +5,7 @@
 #ifndef GPGOMEA_MOARCHIVE_H
 #define GPGOMEA_MOARCHIVE_H
 
+#include <filesystem>
 #include <boost/thread.hpp>
 #include "GPGOMEA/Genotype/Node.h"
 #include "GPGOMEA/Genotype/Multitree.h"

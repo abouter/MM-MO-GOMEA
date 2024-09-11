@@ -36,7 +36,8 @@ def run():
 		'seed':1,
 		'parallel':1,
 		'nrtrees':2,
-		'writeoutput':True
+		'writeoutput':True,
+		'outputdirectory':'output',
 	}
 	models = mgpg.evolve(X,y,**args_dict)
 

@@ -182,8 +182,8 @@ void EvolutionState::SetOptions(int argc, char* argv[]) {
             ("classweights", po::value<string>(), "use class weighting for classification (default is disabled, use a single '_' to set to training set distribution, else specify manually by underscore-separated weights)")
             ("pyprobdef", po::value<string>(), "necessary to set name of module and name of function to use to evaluate individuals (separated by '_', so do not use it in their names them)")
             ("nrtrees", po::value<size_t>(), "sets the number of trees")
-            ("writeoutput", "enables writing output to file");
-
+            ("writeoutput", "enables writing output to file")
+            ("outputdirectory", po::value<string>(), "sets the directory that output files are written to (default: results)");
 
 
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -563,6 +563,10 @@ void EvolutionState::SetOptions(int argc, char* argv[]) {
     if ((vm.count("writeoutput"))) {
         cout << "# writing output to file enabled" << endl;
         config->write_output_files = true;
+    }
+    if ((vm.count("outputdirectory"))) {
+        cout << "# writing output to directory" << endl;
+        config->results_path =  vm["outputdirectory"].as<string>();
     }
 
     cout << "##########################################################################################" << endl;

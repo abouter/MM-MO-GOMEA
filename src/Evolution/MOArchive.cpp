@@ -151,6 +151,8 @@ void MOArchive::InitMOArchive(std::vector<Node *> population) {
 void MOArchive::SaveResults(size_t gen) {
     boost::unique_lock<boost::shared_mutex> read_guard(mo_lock);
     std::string results_path= config->results_path;
+    std::filesystem::create_directories(results_path);
+
     results_path += "/population_" + std::to_string(gen) + ".csv";
 
     std::ofstream myfile(results_path, std::ios::trunc);
