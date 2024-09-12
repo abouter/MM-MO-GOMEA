@@ -157,7 +157,7 @@ void MOArchive::SaveResults(size_t gen) {
 
     std::ofstream myfile(results_path, std::ios::trunc);
     // Write header
-    myfile << "individual;" << "fitness1_train;" << "fitness2_train;" << "fitness1_test;" << "fitness2_test";
+    myfile << "individual;" << "fitness_1_train;" << "fitness_2_train;" << "fitness_1_test;" << "fitness_2_test";
     if( mo_archive.size() == 0 )
     {
         myfile << std::endl;
@@ -170,7 +170,7 @@ void MOArchive::SaveResults(size_t gen) {
         myfile << std::endl;
     }
     else {
-        myfile << ";exp;size" << std::endl;
+        myfile << ";tree;size" << std::endl;
     }
 
     // Write solutions
@@ -180,8 +180,6 @@ void MOArchive::SaveResults(size_t gen) {
             myfile << (p+1) << "; " << mo_archive[p]->cached_objectives[0] << "; " << mo_archive[p]->cached_objectives[1]<< "; " << mo_archive[p]->cached_objectives_test[0]<< "; " << mo_archive[p]->cached_objectives_test[1];
             for (Node *k: (((Multitree *) mo_archive[p])->nodes)) {
                 myfile << ";" << k->GetPythonExpression();
-            }
-            for (Node *k: (((Multitree *) mo_archive[p])->nodes)) {
                 myfile << ";" << k->GetSubtreeNodes(true).size();
             }
             myfile << std::endl;
